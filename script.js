@@ -146,18 +146,30 @@ class Line {
 }
 
 // @mtSound
-// Initialize the lines
+// Initialize the lines on mouse click
 function initialize(e) {
-  //for (let i = 0; i < 20; i++) {
   //start coordinates
-  // const x = Math.random() * canvas.width;
-  // const y = Math.random() * canvas.height;
   let mouseX = parseInt(e.clientX);
   let mouseY = parseInt(e.clientY);
   const color = "lightgreen";
   lines.push(new Line(mouseX, mouseY, color));
-  //}
+  
 }
+
+// // @mtSound
+// // Turn this back on if you want to start the lines randomly
+// function initialize() {
+//   for (let i = 0; i < 20; i++) {
+//     //start coordinates
+//     const x = Math.random() * canvas.width;
+//     const y = Math.random() * canvas.height;
+
+//     const color = "lightgreen";
+//     lines.push(new Line(x, y, color));
+//   }
+// }
+
+
 
 let hueRotate = 0;
 // Update function
@@ -184,13 +196,10 @@ function update() {
 }
 
 
-
-
 // Event listeners
 window.addEventListener("mousemove", handleMouseMove);
 
 // Initialize and start the animation
-//initialize();
 update();
 
 
