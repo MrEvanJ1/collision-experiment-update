@@ -9,14 +9,27 @@
     <title>collision_testing_mt</title>
     <link rel="stylesheet" href="style.css" />
     <!-- @mtSound 
-    * linked the utils script -->
+      * linked the utils script -->
     <script src="utils.js"></script>
 </head>
 
 <body>
+  <!--a master div holds everything and the canvas and button each have their own div within for managing layout
+  and responsiveness -->
+  <div id="masterDiv">
 
-  <link rel="stylesheet" href="style.css">
-  <canvas id="collisionCanvas"></canvas>
+    <div id="button-div1">
+      <button id="button1">
+        CLEAR RANDOM RECT
+      </button>
+    </div>
+  
+    <div id="canvasDiv">
+      <canvas id="collisionCanvas"></canvas>
+    </div>
+
+  </div>
+
   <script src="script.js"></script>
 
 </body>

@@ -1,13 +1,85 @@
 // @mtSound
 const resolution = 3;
 
+//Get master div element and dimensions
+const masterDiv = document.getElementById("masterDiv");
+//set the master div which contains all page elements to the full innerwidth and innerheight of window
+masterDiv.setAttribute("style", `width:${window.innerWidth}px`);
+masterDiv.setAttribute("style", `height:${window.innerHeight}px`);
+//retreive the dimensions of the master div for child Divs to refer to
+const mstrBbox = masterDiv.getBoundingClientRect();
+
+//Get button div element and dimensions
+const buttonDiv = document.getElementById("button-div1");
+//sets the button Div element to one eighth the height of the master Div
+buttonDiv.setAttribute("style", `width:${mstrBbox.width}px`);
+buttonDiv.setAttribute("style", `height:${mstrBbox.height/12}px`);
+//retreive the dimensions of the button div for reference
+const btnBbox = buttonDiv.getBoundingClientRect();
+
 // Get the canvas element
 const canvas = document.getElementById("collisionCanvas");
 const ctx = canvas.getContext("2d");
+const ctx2 = canvas.getContext("2d");
+const cnvDiv = document.getElementById("canvasDiv");
 
-// Set canvas dimensions
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+//set the canvas Div element to occupy the full available space remaining from the button Div
+cnvDiv.setAttribute("style", `width:${mstrBbox.width}px`);
+cnvDiv.setAttribute("style", `height:${mstrBbox.height - btnBbox.height}px`);
+
+const cnvBbox = cnvDiv.getBoundingClientRect();
+
+//set initial canvas size
+canvas.setAttribute("width", cnvBbox.width);
+canvas.setAttribute("height", cnvBbox.height);
+
+// Get button 1
+const button1 = document.getElementById("button1");
+
+//coordinates for clearing using clearRect() method
+let clearX;
+let clearY;
+let clearWidth;
+let clearHeight;
+
+//randomly defines a rectangular areas of the canvas to be cleared
+function clearRandomQuadrant(){
+  clearX = canvas.width*random();
+  clearY = canvas.height*random();
+  clearWidth = Math.round(random(canvas.width));
+  clearHeight = Math.round(random(canvas.height));
+
+  ctx.clearRect(clearX, clearY, clearWidth, clearHeight);
+  console.log("rect cleared");
+
+  //removes from the lines array stored coordinates matching the cleared area 
+  rectClearArraySweep()
+
+  console.log(`lines array just shrank to ${lines.length}` )
+
+}
+/*assigns button 1 the function of clearing randomly defined rectangular areas of the canvas using the
+clearRandomQuadrant() function*/
+button1.addEventListener("click", (e) => {
+  clearRandomQuadrant();
+})
+
+//function to check through lines array and remove any indices matching the most recently cleared rectangle
+function rectClearArraySweep(){
+  for( let i=lines.length-1; i>0; i--){
+
+    if (
+      lines[i].x >= clearX &&
+      lines[i].x <= clearX + clearWidth &&
+      lines[i].y >= clearY &&
+      lines[i].y <= clearY+ clearHeight
+    ){
+      //removes from the array any instance which passed the above conditions
+      lines.splice(i,1);
+      console.log("splicing occurred")
+    }
+  }
+}
 
 // Create an array to hold the lines
 let lines = [];
@@ -151,26 +223,39 @@ function initialize(e) {
   //start coordinates
   let mouseX = parseInt(e.clientX);
   let mouseY = parseInt(e.clientY);
-  const color = "lightgreen";
-  lines.push(new Line(mouseX, mouseY, color));
-  
+  //conditional check ensures that mouse clicks in the button Div area will not register as initialisations of new lines
+  if(mouseY>btnBbox.height){
+    const color = "lightgreen";
+    //"- btnBbox.height" added to correct for an offset that was occuring related to the responsive scaling of the Canvas
+    lines.push(new Line(mouseX, mouseY - btnBbox.height, color));
+  }
 }
 
-// // @mtSound
-// // Turn this back on if you want to start the lines randomly
-// function initialize() {
-//   for (let i = 0; i < 20; i++) {
-//     //start coordinates
-//     const x = Math.random() * canvas.width;
-//     const y = Math.random() * canvas.height;
+// @mtSound
+// Turn this back on if you want to start the lines randomly
+function initialize(e) {
+  let mouseX = parseInt(e.clientX);
+  let mouseY = parseInt(e.clientY);
+  //conditional check ensures that mouse clicks in the button Div area will not register as initialisations of new lines
+  if(mouseY>btnBbox.height){
+    for (let i = 0; i < 10; i++) {
+      //start coordinates
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height;
 
-//     const color = "lightgreen";
-//     lines.push(new Line(x, y, color));
-//   }
-// }
+      const color = "lightgreen";
+      lines.push(new Line(x, y, color));
+    }
+  }
+}
 
+//used by the drawline function in Utils
+let x1;
+let y1;
+let x2;
+let y2;
 
-
+//variable to increment in the update() function for progressively shifting colour hues
 let hueRotate = 0;
 // Update function
 function update() {
@@ -191,7 +276,8 @@ function update() {
       line.draw();
     }
   });
-
+  //enbales shift of hue for multicolour effects
+  hueRotate++;
   requestAnimationFrame(update);
 }
 
