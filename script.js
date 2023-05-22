@@ -145,6 +145,8 @@ class Line {
   }
 }
 
+
+
 // @mtSound
 // Initialize the lines on mouse click
 function initialize(e) {
@@ -159,7 +161,7 @@ function initialize(e) {
 // // @mtSound
 // // Turn this back on if you want to start the lines randomly
 // function initialize() {
-//   for (let i = 0; i < 20; i++) {
+//   for (let i = 0; i < 5; i++) {
 //     //start coordinates
 //     const x = Math.random() * canvas.width;
 //     const y = Math.random() * canvas.height;
@@ -170,8 +172,21 @@ function initialize(e) {
 // }
 
 
+//moves shrunken canvas from top left edge and nearer to centre of window width and height
+ctx.translate(canvas.width/3*1.5,canvas.height/3*1.5)
+//shrinks the Canvas down to fit in the centre of window width and height and allow for space within which to rotate
+ctx.transform(0.3, 0, 0, 0.3, 0, 0);
 
+// //declaring variables related to tracking cleared portions of the Canvas (to know if the cleared coordinates have reached the extremities of the canvas dimensions)
+// //switched off in this rotation-focussed test version of the code
+// let heightTracker=0;
+// let translateOffset = 0.05;
+
+//variable used to set a very occasional chance that the Canvas will clear
+let randomClear = random();
+//variable used to add multicolour hues to the particle line and background over time
 let hueRotate = 0;
+
 // Update function
 function update() {
   // @MrEvanJ1
@@ -183,6 +198,10 @@ function update() {
   //adds a full page canvas rect with dull red at very low opacity that adds that tint and is what allows the trails to build up by drawing over every update
   ctx.fillStyle = 'rgba(50, 20, 20, .01)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+  //adds a very faint white line border around the canvas with dash, which slowly accumulated into concentric rings
+  ctx.strokeStyle=`rgba(255,255,255,${random(0,0.03)})`;
+  ctx.setLineDash([5, 15]);
+  ctx.strokeRect(0,0,canvas.width, canvas.height);
   lines.forEach((line) => {
     // @mtSound
     // added condition for collision
@@ -193,6 +212,37 @@ function update() {
   });
 
   requestAnimationFrame(update);
+
+  //add multicolour hues to the particle line and background over time
+  hueRotate++;
+
+  //steady clockwise rotation of the shrunken canvas
+  ctx.rotate(0.002);
+
+  //sets a very occasional chance that the Canvas will clear
+  randomClear = random();
+  if(randomClear>=0.7654 && randomClear<=0.7656){
+    ctx.clearRect(0,0,canvas.width, canvas.height);
+  }
+  
+  // tests having an eraser square that tracks the mouse. Note mouse XY coordinates go weird when canvas rotation is a factor
+  // ctx.clearRect(mouseX,mouseY,100,100) //mouse 'erasing'
+
+
+  //// ctx.translate(0, translateOffset); //scanning 'line' top down pushing upper y margin until it hits bottom and resets
+  //// switched off in this rotation-focussed test version of the code
+
+  ////clears a horizontal bar of pixels from the topmost area of the canvas which moves progresively downward due to above translation on the Y position
+  // ctx.clearRect(0,0,canvas.width,1)
+
+  ////resets the canvas transform if translation has move to the very bottom of the Canvas height
+  // heightTracker+=translateOffset;
+  // if(heightTracker>=canvas.height){
+  //   // ctx.setTransform(1,0,0,1,0,0);
+  //   heightTracker=0;
+  //   console.log('reset occurred');
+  // }
+
 }
 
 
